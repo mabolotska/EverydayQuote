@@ -26,9 +26,10 @@ final class CategoryLabel: UILabel {
     }
     
     private func configure() {
-        textColor = .label
+        textColor = .white
         adjustsFontSizeToFitWidth = true // shrink a bit to try to fit into the label
         minimumScaleFactor = 0.9
+   
         lineBreakMode = .byTruncatingTail
         translatesAutoresizingMaskIntoConstraints = false
     }

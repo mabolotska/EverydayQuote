@@ -32,9 +32,11 @@ class QuoteCell: UICollectionViewCell {
 
     private func configure() {
         addSubview(categoryLabel)
-        
+        backgroundColor = .blue
+        layer.cornerRadius = 8
         categoryLabel.snp.makeConstraints { make in
-            make.top.leading.equalToSuperview().offset(10)
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview()
         }
     }
 }

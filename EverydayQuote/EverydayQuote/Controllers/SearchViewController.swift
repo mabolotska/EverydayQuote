@@ -15,36 +15,34 @@ enum Section {
 class SearchViewController: UIViewController {
     var isSearching = false
     var collectionView: UICollectionView!
-    var quotes: [Quote] = []
-    var filteredQuotes: [Quote] = []
+    var categoriesArray = Categories().categories
+    var filteredQuotes: [String] = []
     var dataSource: UICollectionViewDiffableDataSource<Section, String>!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        getCategoryData()
-        
         configureCollectionView()
-        configureDataSource()
-        configureViewController()
-        configureSearchController()
+         configureDataSource() 
+        getCategoryData(on: categoriesArray)
+         
+         configureViewController()
+         configureSearchController()
     }
     
     func configureDataSource() {
         dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) {
             (collectionView: UICollectionView, indexPath: IndexPath, identifier: String) -> UICollectionViewCell? in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: QuoteCell.reuseID, for: indexPath) as? QuoteCell
-            cell?.contentView.backgroundColor = .systemBlue // Set your own styling
-            cell?.contentView.layer.cornerRadius = 8 // Set your own styling
-            cell?.contentView.layer.masksToBounds = true // Set your own styling
-            cell?.categoryLabel = identifier
+            cell?.categoryLabel.text = identifier
             return cell
         }
  }
     
-    func getCategoryData() {
-        let categories = Categories().categories
-          
-        
+    func getCategoryData(on categories: [String]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(categories)
+        DispatchQueue.main.async { self.dataSource.apply(snapshot, animatingDifferences: true) }
     }
     
     func configureCollectionView() {
@@ -69,7 +67,7 @@ class SearchViewController: UIViewController {
           let searchController = UISearchController()
           searchController.searchResultsUpdater = self
   
-          searchController.searchBar.placeholder = "Search for a quote"
+          searchController.searchBar.placeholder = "Search for a category"
           searchController.obscuresBackgroundDuringPresentation = false // removes light overlay on results below
           navigationItem.searchController = searchController
 
@@ -81,12 +79,12 @@ class SearchViewController: UIViewController {
 extension SearchViewController: UICollectionViewDelegate {    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // clever way to aleternate on an array
-        let activeArray = isSearching ? filteredQuotes : quotes
+        let activeArray = isSearching ? filteredQuotes : categoriesArray
         let text = activeArray[indexPath.item]
 
         let destVC = QuoteViewController()
        
-        destVC.quoteText = text.quote
+ //       destVC.quoteText = text.quote
 //        destVC.delegate = self
          let navController = UINavigationController(rootViewController: destVC) // gives you the top bar
          present(navController, animated: true)
@@ -97,16 +95,15 @@ extension SearchViewController: UICollectionViewDelegate {
 extension SearchViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         // make sure have text
-        guard let filter = searchController.searchBar.text, filter.isEmpty == false else {
-            filteredQuotes.removeAll()
-   //         updateData(on: quotes)
+        guard let filter = searchController.searchBar.text, !filter.isEmpty else {
             isSearching = false
+            getCategoryData(on: categoriesArray)
+           
             return
         }
         
         isSearching = true
-        // uses two arrays to control which array to show at a given moment
-        filteredQuotes = quotes.filter { $0.quote.lowercased().contains(filter.lowercased()) }
-   //     updateData(on: filteredQuotes)
+        filteredQuotes = categoriesArray.filter { $0.lowercased().contains(filter.lowercased()) }
+        getCategoryData(on: filteredQuotes)
     }
 }
