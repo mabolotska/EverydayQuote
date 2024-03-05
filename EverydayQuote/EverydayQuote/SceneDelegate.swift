@@ -19,8 +19,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
     //    let gameViewModel = GameViewModel()
         
-        let startGameVC = SearchViewController()
-        let navigationController = UINavigationController(rootViewController: startGameVC)
+        let startVC = TabBarViewController()
+        let navigationController = UINavigationController(rootViewController: startVC)
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
         

@@ -80,15 +80,22 @@ extension SearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // clever way to aleternate on an array
         let activeArray = isSearching ? filteredQuotes : categoriesArray
-        let text = activeArray[indexPath.item]
+        let text = activeArray[indexPath.item].addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
 
-        let destVC = QuoteViewController()
-       
- //       destVC.quoteText = text.quote
-//        destVC.delegate = self
-         let navController = UINavigationController(rootViewController: destVC) // gives you the top bar
-         present(navController, animated: true)
-     
+        NetworkManager.shared.fetchData(apiKey: Constants.apiKey, url: Constants.baseURL, word: text, completionHandler: { [weak self] ( result: Result<[Quote], Error>) in
+            switch result {
+            case .success(let quote):
+            let firstQuote = quote.first
+             DispatchQueue.main.async {
+             let destVC = QuoteViewController()
+             destVC.quoteText = "\(firstQuote?.quote ?? "")\n  \(firstQuote?.author ?? "")"
+             let navController = UINavigationController(rootViewController: destVC) // gives you the top bar
+                 self?.present(navController, animated: true)
+             }
+            case .failure(let error):
+                print("Error fetching quotes: \(error)")
+            }
+        })
     }
 }
 

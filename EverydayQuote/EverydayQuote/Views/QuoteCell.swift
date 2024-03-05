@@ -11,7 +11,7 @@ import UIKit
 class QuoteCell: UICollectionViewCell {
     static let reuseID = "QuoteCell"
     
-    let categoryLabel = CategoryLabel(textAlignment: .center, fontSize: 16)
+    let categoryLabel = CategoryLabel(textAlignment: .center, fontSize: 16, textColor: .white)
 
 
     override init(frame: CGRect) {
